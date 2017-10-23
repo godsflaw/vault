@@ -44,15 +44,8 @@ RUN apk add --no-cache ca-certificates gnupg openssl libcap && \
 RUN mkdir -p /vault/logs && \
     mkdir -p /vault/file && \
     mkdir -p /vault/config && \
+    mkdir -p /vault/data && \
     chown -R vault:vault /vault
-
-# Expose the logs directory as a volume since there's potentially long-running
-# state in there
-VOLUME /vault/logs
-
-# Expose the file directory as a volume since there's potentially long-running
-# state in there
-VOLUME /vault/file
 
 # 8200/tcp is the primary interface that applications use to interact with
 # Vault.
@@ -64,7 +57,8 @@ EXPOSE 8200
 # For production derivatives of this container, you shoud add the IPC_LOCK
 # capability so that Vault can mlock memory.
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-COPY consul.hcl /vault/config
+
+COPY config.hcl /vault/config
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # By default you'll get a single-node development server that stores everything
